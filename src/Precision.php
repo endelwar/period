@@ -14,6 +14,7 @@ class Precision
     private const HOUR = 0b111100;
     private const MINUTE = 0b111110;
     private const SECOND = 0b111111;
+    private int $mask;
 
     /**
      * @return self[]
@@ -30,79 +31,124 @@ class Precision
         ];
     }
 
-    private function __construct(
-        private int $mask
-    ) {
+    private function __construct(int $mask)
+    {
+        $this->mask = $mask;
     }
 
-    public static function fromString(string $string): self
+    /**
+     * @return $this
+     */
+    public static function fromString(string $string)
     {
         preg_match('/([\d]{4})(-[\d]{2})?(-[\d]{2})?(\s[\d]{2})?(:[\d]{2})?(:[\d]{2})?/', $string, $matches);
 
-        return match (count($matches) - 1) {
-            1 => self::YEAR(),
-            2 => self::MONTH(),
-            3 => self::DAY(),
-            4 => self::HOUR(),
-            5 => self::MINUTE(),
-            6 => self::SECOND(),
-        };
+        switch (count($matches) - 1) {
+            case 1:
+                return self::YEAR();
+            case 2:
+                return self::MONTH();
+            case 3:
+                return self::DAY();
+            case 4:
+                return self::HOUR();
+            case 5:
+                return self::MINUTE();
+            case 6:
+                return self::SECOND();
+        }
     }
 
-    public static function YEAR(): self
+    /**
+     * @return $this
+     */
+    public static function YEAR()
     {
         return new self(self::YEAR);
     }
 
-    public static function MONTH(): self
+    /**
+     * @return $this
+     */
+    public static function MONTH()
     {
         return new self(self::MONTH);
     }
 
-    public static function DAY(): self
+    /**
+     * @return $this
+     */
+    public static function DAY()
     {
         return new self(self::DAY);
     }
 
-    public static function HOUR(): self
+    /**
+     * @return $this
+     */
+    public static function HOUR()
     {
         return new self(self::HOUR);
     }
 
-    public static function MINUTE(): self
+    /**
+     * @return $this
+     */
+    public static function MINUTE()
     {
         return new self(self::MINUTE);
     }
 
-    public static function SECOND(): self
+    /**
+     * @return $this
+     */
+    public static function SECOND()
     {
         return new self(self::SECOND);
     }
 
     public function interval(): DateInterval
     {
-        $interval = match ($this->mask) {
-            self::SECOND => 'PT1S',
-            self::MINUTE => 'PT1M',
-            self::HOUR => 'PT1H',
-            self::DAY => 'P1D',
-            self::MONTH => 'P1M',
-            self::YEAR => 'P1Y',
-        };
+        switch ($this->mask) {
+            case self::SECOND:
+                $interval = 'PT1S';
+                break;
+            case self::MINUTE:
+                $interval = 'PT1M';
+                break;
+            case self::HOUR:
+                $interval = 'PT1H';
+                break;
+            case self::DAY:
+                $interval = 'P1D';
+                break;
+            case self::MONTH:
+                $interval = 'P1M';
+                break;
+            case self::YEAR:
+                $interval = 'P1Y';
+                break;
+        }
 
         return new DateInterval($interval);
     }
 
     public function intervalName(): string
     {
-        return match ($this->mask) {
-            self::YEAR => 'y',
-            self::MONTH => 'm',
-            self::DAY => 'd',
-            self::HOUR => 'h',
-            self::MINUTE => 'i',
-            self::SECOND => 's',
-        };
+        switch ($this->mask) {
+            case self::YEAR:
+                return 'y';
+            case self::MONTH:
+                return 'm';
+            case self::DAY:
+                return 'd';
+            case self::HOUR:
+                return 'h';
+            case self::MINUTE:
+                return 'i';
+            case self::SECOND:
+                return 's';
+        }
     }
 
     public function roundDate(DateTimeInterface $date): DateTimeImmutable
@@ -169,13 +215,19 @@ class Precision
 
     public function dateFormat(): string
     {
-        return match ($this->mask) {
-            Precision::SECOND => 'Y-m-d H:i:s',
-            Precision::MINUTE => 'Y-m-d H:i',
-            Precision::HOUR => 'Y-m-d H',
-            Precision::DAY => 'Y-m-d',
-            Precision::MONTH => 'Y-m',
-            Precision::YEAR => 'Y',
-        };
+        switch ($this->mask) {
+            case Precision::SECOND:
+                return 'Y-m-d H:i:s';
+            case Precision::MINUTE:
+                return 'Y-m-d H:i';
+            case Precision::HOUR:
+                return 'Y-m-d H';
+            case Precision::DAY:
+                return 'Y-m-d';
+            case Precision::MONTH:
+                return 'Y-m';
+            case Precision::YEAR:
+                return 'Y';
+        }
     }
 }

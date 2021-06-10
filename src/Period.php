@@ -28,13 +28,21 @@ class Period implements IteratorAggregate
     protected DateTimeImmutable $includedEnd;
 
     protected DateInterval $interval;
+    protected DateTimeImmutable $start;
+    protected DateTimeImmutable $end;
+    protected Precision $precision;
+    protected Boundaries $boundaries;
 
     public function __construct(
-        protected DateTimeImmutable $start,
-        protected DateTimeImmutable $end,
-        protected Precision $precision,
-        protected Boundaries $boundaries
+        DateTimeImmutable $start,
+        DateTimeImmutable $end,
+        Precision $precision,
+        Boundaries $boundaries
     ) {
+        $this->start = $start;
+        $this->end = $end;
+        $this->precision = $precision;
+        $this->boundaries = $boundaries;
         if ($start > $end) {
             throw InvalidPeriod::endBeforeStart($start, $end);
         }
@@ -46,24 +54,25 @@ class Period implements IteratorAggregate
         $this->asString = $this->resolveString();
     }
 
+    /**
+     * @param \DateTimeInterface|string $start
+     * @param \DateTimeInterface|string $end
+     * @return $this
+     */
     public static function make(
-        DateTimeInterface | string $start,
-        DateTimeInterface | string $end,
+        $start,
+        $end,
         ?Precision $precision = null,
         ?Boundaries $boundaries = null,
         ?string $format = null
-    ): static {
-        return PeriodFactory::make(
-            periodClass: static::class,
-            start: $start,
-            end: $end,
-            precision: $precision,
-            boundaries: $boundaries,
-            format: $format,
-        );
+    ) {
+        return PeriodFactory::make(static::class, $start, $end, $precision, $boundaries, $format);
     }
 
-    public static function fromString(string $string): static
+    /**
+     * @return $this
+     */
+    public static function fromString(string $string)
     {
         return PeriodFactory::fromString(static::class, $string);
     }

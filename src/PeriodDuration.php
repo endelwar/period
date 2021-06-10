@@ -8,9 +8,10 @@ use DateTimeImmutable;
 
 class PeriodDuration
 {
-    public function __construct(
-        private Period $period
-    ) {
+    private Period $period;
+    public function __construct(Period $period)
+    {
+        $this->period = $period;
     }
 
     public function equals(PeriodDuration $other): bool
