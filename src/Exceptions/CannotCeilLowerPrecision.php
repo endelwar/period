@@ -17,13 +17,19 @@ class CannotCeilLowerPrecision extends Exception
 
     protected static function unitName(Precision $precision)
     {
-        return match ($precision->intervalName()) {
-            'y' => 'year',
-            'm' => 'month',
-            'd' => 'day',
-            'h' => 'hour',
-            'i' => 'minute',
-            's' => 'second',
-        };
+        switch ($precision->intervalName()) {
+            case 'y':
+                return 'year';
+            case 'm':
+                return 'month';
+            case 'd':
+                return 'day';
+            case 'h':
+                return 'hour';
+            case 'i':
+                return 'minute';
+            case 's':
+                return 'second';
+        }
     }
 }

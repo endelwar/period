@@ -4,7 +4,6 @@ namespace Spatie\Period;
 
 use DateTime;
 use DateTimeImmutable;
-use DateTimeInterface;
 use Spatie\Period\Exceptions\InvalidDate;
 
 class PeriodFactory
@@ -27,18 +26,17 @@ class PeriodFactory
 
         $end = self::resolveDate($endDate, $precision->dateFormat());
 
-        return new $periodClass(
-            start: $start,
-            end: $end,
-            precision: $precision,
-            boundaries: $boundaries,
-        );
+        return new $periodClass($start, $end, $precision, $boundaries);
     }
 
+    /**
+     * @param string|\DateTimeInterface $start
+     * @param string|\DateTimeInterface $end
+     */
     public static function make(
         string $periodClass,
-        string | DateTimeInterface $start,
-        string | DateTimeInterface $end,
+        $start,
+        $end,
         ?Precision $precision = null,
         ?Boundaries $boundaries = null,
         ?string $format = null
@@ -49,12 +47,7 @@ class PeriodFactory
         $end = $precision->roundDate(self::resolveDate($end, $format));
 
         /** @var \Spatie\Period\Period $period */
-        $period = new $periodClass(
-            start: $start,
-            end: $end,
-            precision: $precision,
-            boundaries: $boundaries,
-        );
+        $period = new $periodClass($start, $end, $precision, $boundaries);
 
         return $period;
     }
@@ -64,24 +57,21 @@ class PeriodFactory
         DateTimeImmutable $includedStart,
         DateTimeImmutable $includedEnd,
         Precision $precision,
-        Boundaries $boundaries,
+        Boundaries $boundaries
     ): Period {
         $includedStart = $precision->roundDate(self::resolveDate($includedStart));
         $includedEnd = $precision->roundDate(self::resolveDate($includedEnd));
-
         /** @var \Spatie\Period\Period $period */
-        $period = new $periodClass(
-            start: $boundaries->realStart($includedStart, $precision),
-            end: $boundaries->realEnd($includedEnd, $precision),
-            precision: $precision,
-            boundaries: $boundaries,
-        );
-
+        $period = new $periodClass($boundaries->realStart($includedStart, $precision),
+            $boundaries->realEnd($includedEnd, $precision), $precision, $boundaries);
         return $period;
     }
 
+    /**
+     * @param \DateTimeInterface|string $date
+     */
     protected static function resolveDate(
-        DateTimeInterface | string $date,
+        $date,
         ?string $format = null
     ): DateTimeImmutable {
         if ($date instanceof DateTimeImmutable) {
@@ -92,7 +82,7 @@ class PeriodFactory
             return DateTimeImmutable::createFromMutable($date);
         }
 
-        if (! is_string($date)) {
+        if (!is_string($date)) {
             throw InvalidDate::forFormat($date, $format);
         }
 
@@ -104,7 +94,7 @@ class PeriodFactory
             throw InvalidDate::forFormat($date, $format);
         }
 
-        if (! str_contains($format, ' ')) {
+        if (strpos($format, ' ') === false) {
             $dateTime = $dateTime->setTime(0, 0, 0);
         }
 
@@ -119,7 +109,7 @@ class PeriodFactory
             return $format;
         }
 
-        if (! str_contains($format, ' ') && str_contains($date, ' ')) {
+        if (strpos($format, ' ') === false && strpos($date, ' ') !== false) {
             return 'Y-m-d H:i:s';
         }
 

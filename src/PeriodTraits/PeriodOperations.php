@@ -9,7 +9,10 @@ use Spatie\Period\PeriodFactory;
 /** @mixin Period */
 trait PeriodOperations
 {
-    public function gap(Period $period): ?static
+    /**
+     * @return $this|null
+     */
+    public function gap(Period $period)
     {
         $this->ensurePrecisionMatches($period);
 
@@ -36,7 +39,10 @@ trait PeriodOperations
         );
     }
 
-    public function overlap(Period ...$others): ?static
+    /**
+     * @return $this|null
+     */
+    public function overlap(Period ...$others)
     {
         if (count($others) > 1) {
             return $this->overlapAll(...$others);
@@ -58,16 +64,13 @@ trait PeriodOperations
             return null;
         }
 
-        return PeriodFactory::makeWithBoundaries(
-            static::class,
-            $includedStart,
-            $includedEnd,
-            $this->precision(),
-            $this->boundaries(),
-        );
+        return PeriodFactory::makeWithBoundaries(static::class, $includedStart, $includedEnd, $this->precision(), $this->boundaries());
     }
 
-    protected function overlapAll(Period ...$periods): ?static
+    /**
+     * @return $this|null
+     */
+    protected function overlapAll(Period ...$periods)
     {
         $overlap = clone $this;
 
@@ -132,23 +135,11 @@ trait PeriodOperations
         }
 
         if ($this->includedStart() < $other->includedStart()) {
-            $collection[] = PeriodFactory::makeWithBoundaries(
-                static::class,
-                $this->includedStart(),
-                $other->includedStart()->sub($this->interval),
-                $this->precision(),
-                $this->boundaries(),
-            );
+            $collection[] = PeriodFactory::makeWithBoundaries(static::class, $this->includedStart(), $other->includedStart()->sub($this->interval), $this->precision(), $this->boundaries());
         }
 
         if ($this->includedEnd() > $other->includedEnd()) {
-            $collection[] = PeriodFactory::makeWithBoundaries(
-                static::class,
-                $other->includedEnd()->add($this->interval),
-                $this->includedEnd(),
-                $this->precision(),
-                $this->boundaries(),
-            );
+            $collection[] = PeriodFactory::makeWithBoundaries(static::class, $other->includedEnd()->add($this->interval), $this->includedEnd(), $this->precision(), $this->boundaries());
         }
 
         return $collection;
@@ -190,7 +181,10 @@ trait PeriodOperations
         return $boundaries->subtract($overlap);
     }
 
-    public function renew(): static
+    /**
+     * @return $this
+     */
+    public function renew()
     {
         $length = $this->includedStart->diff($this->includedEnd);
 
