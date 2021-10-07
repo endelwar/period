@@ -10,20 +10,25 @@ class Boundaries
     private const EXCLUDE_START = 2;
     private const EXCLUDE_END = 4;
     private const EXCLUDE_ALL = 6;
+    private int $mask;
 
-    private function __construct(
-        private int $mask
-    ) {
+    private function __construct(int $mask)
+    {
+        $this->mask = $mask;
     }
 
     public static function fromString(string $startBoundary, string $endBoundary): self
     {
-        return match("{$startBoundary}{$endBoundary}") {
-            '[]' => self::EXCLUDE_NONE(),
-            '[)' => self::EXCLUDE_END(),
-            '(]' => self::EXCLUDE_START(),
-            '()' => self::EXCLUDE_ALL(),
-        };
+        switch ("{$startBoundary}{$endBoundary}") {
+            case '[]':
+                return self::EXCLUDE_NONE();
+            case '[)':
+                return self::EXCLUDE_END();
+            case '(]':
+                return self::EXCLUDE_START();
+            case '()':
+                return self::EXCLUDE_ALL();
+        }
     }
 
     public static function EXCLUDE_NONE(): self

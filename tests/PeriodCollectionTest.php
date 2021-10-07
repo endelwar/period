@@ -135,9 +135,9 @@ class PeriodCollectionTest extends TestCase
     public function no_gaps_when_periods_fully_overlap_and_end_excluded()
     {
         $collection = new PeriodCollection(
-            Period::make('2018-01-01', '2018-01-05', boundaries: Boundaries::EXCLUDE_END()),
-            Period::make('2018-01-01', '2018-01-05', boundaries: Boundaries::EXCLUDE_END()),
-            Period::make('2018-01-01', '2018-01-05', boundaries: Boundaries::EXCLUDE_END())
+            Period::make('2018-01-01', '2018-01-05', null, Boundaries::EXCLUDE_END()),
+            Period::make('2018-01-01', '2018-01-05', null, Boundaries::EXCLUDE_END()),
+            Period::make('2018-01-01', '2018-01-05', null, Boundaries::EXCLUDE_END())
         );
 
         $gaps = $collection->gaps();
@@ -249,10 +249,7 @@ class PeriodCollectionTest extends TestCase
             Period::make('1987-02-11', '1987-02-28')
         );
 
-        $subtract = new PeriodCollection(
-            Period::make('1987-02-05', '1987-02-06'),
-            Period::make('1987-02-20', '1987-02-21'),
-        );
+        $subtract = new PeriodCollection(Period::make('1987-02-05', '1987-02-06'), Period::make('1987-02-20', '1987-02-21'));
 
         $result = $a->subtract($subtract);
 
