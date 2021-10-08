@@ -215,4 +215,14 @@ class PeriodCollection implements ArrayAccess, Iterator, Countable
 
         return $collection;
     }
+
+    public function unique(): PeriodCollection
+    {
+        $uniquePeriods = [];
+        foreach ($this->periods as $period) {
+            $uniquePeriods[$period->asString()] = $period;
+        }
+
+        return new static(...array_values($uniquePeriods));
+    }
 }
