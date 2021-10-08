@@ -204,4 +204,15 @@ class PeriodCollection implements ArrayAccess, Iterator, Countable
 
         return $overlaps;
     }
+
+    public function sort(): PeriodCollection
+    {
+        $collection = clone $this;
+
+        usort($collection->periods, static function (Period $a, Period $b) {
+            return $a->includedStart() <=> $b->includedStart();
+        });
+
+        return $collection;
+    }
 }
